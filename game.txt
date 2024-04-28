@@ -1,0 +1,186 @@
+import random
+from time import sleep
+while True:
+  select_game = input('遊びたいゲームの番号を選んでください\n1 数当てゲーム\n2 ブラックジャック\n3 ゲームを止める\n')
+  if int(select_game) == 1:
+    print('\n数当てゲームを始めます\nゲームの説明を聞きますか?')
+    while True:
+      start = input('y / n を入力してください : ')
+      if start == 'y':
+        sleep(1)
+        print('\n３桁の数字を当てよう! \nHit : 桁と数字があっている \nBlow : 数字があっている')
+        break
+      elif start == 'n':
+        break
+    sleep(2)
+    print('\nゲームを開始します')
+    number_list = random.sample(range(0,9),3)
+    count = 1
+    while True:
+      if count > 10:
+        giveup = input('\nギブアップしますか\n y / n を入力してください : ')
+        if giveup == 'y':
+          map_number = map(str,number_list)
+          number = "".join(map_number)
+          print('\n答えは',number,'です')
+          break
+        else:
+          pass
+      sleep(1)
+      answer = input('\n３桁の数字を入力してください : ')        
+      if answer.isdigit():
+        if len(answer) == 3:
+          H = 0
+          B = 0
+          answer_list = list(map(int,answer))
+          for i,j in zip(number_list,answer_list):
+            if i == j:
+              H += 1
+            elif i in answer_list:
+              B += 1
+
+          if H == 3:
+            print(count,'回で正解しました!')
+            break
+
+          print(H,'Hit',B,'Blow')
+          count += 1
+
+    print('\n数当てゲーム終了')
+    print()
+
+
+  if int(select_game) == 2:
+    print('\nブラックジャックを始めます\nゲームの説明を聞きますか？')
+    while True:
+      start = input('y / n を入力してください　: ')
+      if start == 'y':
+        sleep(1)
+        print('\nカードの合計が21に近い方が勝利！ただし21を超えると即失格...')
+        print('点数の数え方は\n2~9はそのままの数字\n10・J・Q・Kは全て10\nA(エース)は1か11のどちらかです')
+        sleep(3)
+        print('\n手順\n1 : 2枚配られます\n2 : カードを追加する場合はHit、しない場合はStand\n3 : Standした後の数字を比べて21に近い方が勝利！')
+        print('※CPUのカードは一枚だけ見る事ができます')
+        sleep(5)
+        break
+      elif start == 'n':
+        break
+
+    sleep(1)
+    print('\nゲームを開始します')
+    print()
+    card = [1,2,3,4,5,6,7,8,9,10,11,12,13] * 4
+    def hand():
+      hand = []
+      for i in range(2):
+        random.shuffle(card)
+        pick = card.pop()
+        if pick == 1:
+          pick = 'A'
+        elif pick == 11:
+          pick = 'J'
+        elif pick == 12:
+          pick = 'Q'
+        elif pick == 13:
+          pick = 'K'
+        hand.append(pick)
+      return hand
+
+    def Hit(hand):
+      random.shuffle(card)
+      pick = card.pop()
+      if pick == 1:
+        pick = 'A'
+      elif pick == 11:
+        pick = 'J'
+      elif pick == 12:
+        pick = 'Q'
+      elif pick == 13:
+        pick = 'K'
+      hand.append(pick)
+      return hand
+
+    def sum(hand):
+      score = 0
+      for i in hand:
+        if i == "J" or i == "Q" or i == "K":
+          score += 10
+        elif i == "A":
+          if score >=11:
+            score += 1
+          else:
+            score += 11
+        else:
+          score += i
+      return score
+    def result_menu(dealer_hand,player_hand):
+      player_card = ','.join(map(str,player_hand))
+      dealer_card = ','.join(map(str,dealer_hand))
+      print('相手のカード : ',dealer_card,'合計 : ',sum(dealer_hand))
+      print('あなたのカード : ',player_card,'合計 : ',sum(player_hand))
+
+    def result(dealer_hand,player_hand):
+      if sum(player_hand) > 21:
+        print()
+        result_menu(dealer_hand,player_hand)
+        print('相手の勝利！')
+        print()
+        sleep(2)
+      if sum(dealer_hand) > 21:
+        print()
+        result_menu(dealer_hand,player_hand)
+        2
+        print('あなたの勝利！')
+        print()
+        sleep(2)
+      if sum(player_hand) <= 21 and sum(dealer_hand) <= 21:
+        if sum(player_hand) > sum(dealer_hand):
+          print()
+          result_menu(dealer_hand,player_hand)
+          print('あなたの勝利！')
+          print()
+          sleep(2)
+        elif sum(dealer_hand) > sum(player_hand):
+          print()
+          result_menu(dealer_hand,player_hand)
+          print('相手の勝利！')
+          print()
+          sleep(2)
+        elif sum(dealer_hand) == sum(player_hand):
+          print()
+          result_menu(dealer_hand,player_hand)
+          print('引き分け！')
+          print()
+          sleep(2)
+
+    dealer_hand = hand()
+    player_hand = hand()
+    player_card = ','.join(map(str,player_hand))
+    dealer_card = ','.join(map(str,dealer_hand))
+    sleep(2)
+    print('相手のカード : ',dealer_hand[0],)
+    print('あなたのカード : ',player_card,'合計 : ',sum(player_hand))
+    sleep(2)
+    while True:
+      print()
+      select = input('Hitしますか　Standしますか\nh / s を入力してください : ')
+      if select == 'h':
+        sleep(2)
+        Hit(player_hand)
+        print('あなたは',player_hand[-1],'を引き合計が',sum(player_hand),'になりました')
+        if sum(player_hand) > 21:
+          print('あなたの合計が21を超えました')
+          result(dealer_hand,player_hand)
+          break
+      elif select == 's':
+        while sum(dealer_hand) <17:
+          Hit(dealer_hand)
+          print('相手はHitし',dealer_hand[-1],'を引きました')
+        if sum(dealer_hand) >21:
+          print('相手の合計が21を超えました')
+        result(dealer_hand,player_hand)
+        break
+
+  if int(select_game) == 3:
+    print('ゲームを終了します')
+    break
